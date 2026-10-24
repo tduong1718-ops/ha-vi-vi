@@ -9,7 +9,33 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const isDev = process.env.NODE_ENV !== 'production';
-const PORT = isDev ? 3000 : (process.env.PORT || 3000);
+
+// Support CLI flags like --port and --host passed by dev runners
+function parsePort(): number {
+  const args = process.argv.slice(2);
+  const portIndex = args.indexOf('--port');
+  if (portIndex !== -1 && args[portIndex + 1]) {
+    const parsed = parseInt(args[portIndex + 1], 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  if (process.env.PORT) {
+    const parsed = parseInt(process.env.PORT, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return 3000;
+}
+
+function parseHost(): string {
+  const args = process.argv.slice(2);
+  const hostIndex = args.indexOf('--host');
+  if (hostIndex !== -1 && args[hostIndex + 1]) {
+    return args[hostIndex + 1];
+  }
+  return '0.0.0.0';
+}
+
+const PORT = parsePort();
+const HOST = parseHost();
 
 app.use(express.json());
 
@@ -281,24 +307,43 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount Vite or static files
 async function startServer() {
-  if (isDev) {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(__dirname, 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
+  try {
+    if (isDev) {
+      const vite = await createViteServer({
+        server: {
+          middlewareMode: true,
+          hmr: process.env.DISABLE_HMR === 'true' ? false : undefined,
+        },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.join(__dirname, 'dist');
+      app.use(express.static(distPath));
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+      });
+    }
 
-  const portNumber = Number(PORT) || 3000;
-  app.listen(portNumber, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${portNumber}`);
-  });
+    const server = app.listen(PORT, HOST, () => {
+      console.log(`Server running on http://${HOST}:${PORT}`);
+    });
+
+    server.on('error', (err: any) => {
+      console.error('Server error encountered:', err);
+    });
+
+    const shutdown = () => {
+      server.close(() => {
+        process.exit(0);
+      });
+    };
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
 }
 
 startServer();
