@@ -35,7 +35,9 @@ export default function App() {
 
   // Data states
   const [profile, setProfile] = useState<CreatorProfile>(INITIAL_PROFILE);
-  const [characters, setCharacters] = useState<Character[]>(INITIAL_CHARACTERS);
+  const [characters, setCharacters] = useState<Character[]>(() =>
+    ApiService.getInitialCharactersSync()
+  );
   const [confessions, setConfessions] = useState<Confession[]>([]);
   const [lettersLoading, setLettersLoading] = useState<boolean>(true);
 

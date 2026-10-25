@@ -116,17 +116,51 @@ export class ApiService {
   }
 
   // --- Character & View Counter methods ---
+  static getInitialCharactersSync(): Character[] {
+    let viewsMap: Record<string, number> = {};
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(CHAR_VIEWS_KEY) : null;
+      if (raw) viewsMap = JSON.parse(raw);
+    } catch {
+      // ignored
+    }
+
+    let customChars: Character[] = [];
+    try {
+      const stored = typeof window !== 'undefined' ? localStorage.getItem(CHARACTERS_KEY) : null;
+      if (stored) {
+        customChars = JSON.parse(stored)
+          .filter((item: any) => !LEGACY_SAMPLE_IDS.has(String(item?.id)))
+          .map(normalizeCharacter);
+      }
+    } catch {
+      // ignored
+    }
+
+    const initialIds = new Set(INITIAL_CHARACTERS.map((c) => c.id));
+    const extraCustom = customChars.filter((c) => !initialIds.has(c.id));
+    const all = [...INITIAL_CHARACTERS, ...extraCustom];
+
+    return all.map((c) => ({
+      ...c,
+      views: Math.max(Number(viewsMap[c.id]) || 0, Number(c.views) || 0),
+    }));
+  }
+
   static async getCharacterViewsMap(): Promise<Record<string, number>> {
     let localViews: Record<string, number> = {};
     try {
-      const raw = localStorage.getItem(CHAR_VIEWS_KEY);
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(CHAR_VIEWS_KEY) : null;
       if (raw) localViews = JSON.parse(raw);
     } catch {
       // ignored
     }
 
     try {
-      const res = await fetch('/api/character-views');
+      const res = await fetch(`/api/character-views?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
       if (res.ok) {
         const serverViews = await res.json();
         if (serverViews && typeof serverViews === 'object') {
@@ -134,12 +168,16 @@ export class ApiService {
           for (const [k, v] of Object.entries(serverViews)) {
             merged[k] = Math.max(Number(merged[k]) || 0, Number(v) || 0);
           }
-          localStorage.setItem(CHAR_VIEWS_KEY, JSON.stringify(merged));
+          try {
+            localStorage.setItem(CHAR_VIEWS_KEY, JSON.stringify(merged));
+          } catch {
+            // ignored
+          }
           return merged;
         }
       }
-    } catch {
-      // Fallback to localViews
+    } catch (err) {
+      console.warn('Network error getting character views:', err);
     }
     return localViews;
   }
@@ -147,7 +185,7 @@ export class ApiService {
   static async incrementCharacterView(id: string): Promise<number> {
     let localViews: Record<string, number> = {};
     try {
-      const raw = localStorage.getItem(CHAR_VIEWS_KEY);
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(CHAR_VIEWS_KEY) : null;
       if (raw) localViews = JSON.parse(raw);
     } catch {
       // ignored
@@ -155,22 +193,34 @@ export class ApiService {
 
     let nextCount = (Number(localViews[id]) || 0) + 1;
     localViews[id] = nextCount;
-    localStorage.setItem(CHAR_VIEWS_KEY, JSON.stringify(localViews));
+    try {
+      localStorage.setItem(CHAR_VIEWS_KEY, JSON.stringify(localViews));
+    } catch {
+      // ignored
+    }
 
     try {
-      const res = await fetch(`/api/characters/${encodeURIComponent(id)}/view`, {
+      const res = await fetch(`/api/characters/${encodeURIComponent(id)}/view?_t=${Date.now()}`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+        },
       });
       if (res.ok) {
         const data = await res.json();
         if (typeof data?.views === 'number') {
           nextCount = Math.max(nextCount, data.views);
           localViews[id] = nextCount;
-          localStorage.setItem(CHAR_VIEWS_KEY, JSON.stringify(localViews));
+          try {
+            localStorage.setItem(CHAR_VIEWS_KEY, JSON.stringify(localViews));
+          } catch {
+            // ignored
+          }
         }
       }
-    } catch {
-      // Fallback to local count
+    } catch (err) {
+      console.warn('Network error incrementing view count:', err);
     }
 
     return nextCount;
@@ -178,48 +228,51 @@ export class ApiService {
 
   static async getCharacters(): Promise<Character[]> {
     const viewsMap = await this.getCharacterViewsMap();
-
-    const mergeWithInitial = (items: Character[]): Character[] => {
-      const byId = new Map<string, Character>();
-      items.forEach((c) => byId.set(c.id, c));
-      INITIAL_CHARACTERS.forEach((initChar) => byId.set(initChar.id, initChar));
-
-      const initialIds = new Set(INITIAL_CHARACTERS.map((c) => c.id));
-      const customChars = items.filter((c) => !initialIds.has(c.id));
-      return [...INITIAL_CHARACTERS.map((c) => byId.get(c.id)!), ...customChars].map((c) => ({
-        ...c,
-        views: Math.max(Number(viewsMap[c.id]) || 0, Number(c.views) || 0),
-      }));
-    };
+    let customChars: Character[] = [];
 
     try {
-      const res = await fetch('/api/characters');
+      const res = await fetch(`/api/characters?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
-          const cleaned = data
+          customChars = data
             .filter((item) => !LEGACY_SAMPLE_IDS.has(String(item?.id)))
             .map(normalizeCharacter);
-          if (cleaned.length > 0) {
-            return mergeWithInitial(cleaned);
-          }
         }
       }
     } catch {
-      // Fallback
+      // Fallback to local storage custom chars
+      try {
+        const stored = typeof window !== 'undefined' ? localStorage.getItem(CHARACTERS_KEY) : null;
+        if (stored) {
+          customChars = JSON.parse(stored)
+            .filter((item: any) => !LEGACY_SAMPLE_IDS.has(String(item?.id)))
+            .map(normalizeCharacter);
+        }
+      } catch {
+        // ignored
+      }
     }
-    const stored = localStorage.getItem(CHARACTERS_KEY);
-    if (!stored) {
-      const initialWithViews = mergeWithInitial(INITIAL_CHARACTERS);
-      localStorage.setItem(CHARACTERS_KEY, JSON.stringify(initialWithViews));
-      return initialWithViews;
+
+    const initialIds = new Set(INITIAL_CHARACTERS.map((c) => c.id));
+    const extraCustom = customChars.filter((c) => !initialIds.has(c.id));
+    const all = [...INITIAL_CHARACTERS, ...extraCustom];
+
+    const result = all.map((c) => ({
+      ...c,
+      views: Math.max(Number(viewsMap[c.id]) || 0, Number(c.views) || 0),
+    }));
+
+    try {
+      localStorage.setItem(CHARACTERS_KEY, JSON.stringify(result));
+    } catch {
+      // ignored
     }
-    const parsed = JSON.parse(stored)
-      .filter((item: any) => !LEGACY_SAMPLE_IDS.has(String(item?.id)))
-      .map(normalizeCharacter);
-    const merged = mergeWithInitial(parsed);
-    localStorage.setItem(CHARACTERS_KEY, JSON.stringify(merged));
-    return merged;
+
+    return result;
   }
 
   static async addCharacter(char: Omit<Character, 'id' | 'views'>): Promise<Character> {

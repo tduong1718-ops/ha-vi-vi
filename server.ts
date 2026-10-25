@@ -159,11 +159,13 @@ app.delete('/api/characters/:id', (req, res) => {
 });
 
 app.get('/api/character-views', (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
   const store = loadData();
   res.json(store.characterViews || {});
 });
 
 app.post('/api/characters/:id/view', (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
   const { id } = req.params;
   const store = loadData();
   if (!store.characterViews) {

@@ -1034,14 +1034,14 @@ Giang Thính Hạ dừng những ngón tay đang gõ phím. Hắn chậm rãi ng
 
 "Chơi đùa thôi. Nhàm chán.”`,
     ggaiLink:
-      'https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221oOGRukODp-Ls7r7C-5bjRcdkkaaa-ovH%22%5D,%22action%22:%22open%22,%22userId%22:%22103926593931503142363%22,%22resourceKeys%22:%7B%7D%7D',
+      'https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%2213qyyX9COAV9XuUy18OomWIVxv-aYTTEF%22%5D,%22action%22:%22open%22,%22userId%22:%22103926593931503142363%22,%22resourceKeys%22:%7B%7D%7D',
     ggaiLinks: [
       {
-        label: 'Bản Có Yêu',
-        url: 'https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221oOGRukODp-Ls7r7C-5bjRcdkkaaa-ovH%22%5D,%22action%22:%22open%22,%22userId%22:%22103926593931503142363%22,%22resourceKeys%22:%7B%7D%7D',
+        label: 'Có yêu',
+        url: 'https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%2213qyyX9COAV9XuUy18OomWIVxv-aYTTEF%22%5D,%22action%22:%22open%22,%22userId%22:%22103926593931503142363%22,%22resourceKeys%22:%7B%7D%7D',
       },
       {
-        label: 'Bản Không Yêu',
+        label: 'Không Yêu',
         url: 'https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221oOGRukODp-Ls7r7C-5bjRcdkkaaa-ovH%22%5D,%22action%22:%22open%22,%22userId%22:%22103926593931503142363%22,%22resourceKeys%22:%7B%7D%7D',
       },
     ],
