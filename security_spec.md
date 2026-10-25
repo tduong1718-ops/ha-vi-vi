@@ -9,6 +9,7 @@
 6. **Identity & Creator Badge Protection**: `authorUid` must match `request.auth.uid` when signed in or `'anonymous'` when unauthenticated. `isCreator == true` on replies is strictly gated to the verified runtime creator email (`tttduong1105@gmail.com` with `email_verified == true`).
 7. **Atomic Relational Sync**: Creating a reply in `/letters/{letterId}/replies/{replyId}` requires parent `/letters/{letterId}` to exist with `status == 'approved'` and atomically increment `repliesCount` by `+1` in the same batch (`getAfter`).
 8. **Action-Based Immutable Updates & No Client Deletes**: Letter updates can only increment `heartsCount` by `+1` or `repliesCount` by `+1` while keeping all content, sender, image, status, and creation metadata immutable. Client deletes are forbidden (`allow delete: if false`).
+9. **Character Views Cumulative Invariant**: `/character_views/{characterId}` stores cumulative views. Creation must start at `views == 1` with server timestamp. Updates must only increment `views` by `+1` with server timestamp and keep `characterId` immutable. Deletes are forbidden.
 
 ## 2. The "Dirty Dozen" Adversarial Payloads (All Must Return `PERMISSION_DENIED`)
 1. **Shadow Field Injection on Letter Create**: Valid letter payload + `"isAdmin": true` -> Rejected by `hasOnly(...)`.
@@ -22,4 +23,5 @@
 9. **Creator Impersonation with Unverified Email**: Reply with `isCreator: true` where `email == 'tttduong1105@gmail.com'` but `email_verified == false` -> Rejected by `isVerifiedCreator()`.
 10. **UID Spoofing**: Unauthenticated client setting `authorUid: "victim-uid-123"` -> Rejected by `(!isSignedIn() && incoming().authorUid == 'anonymous')`.
 11. **Orphaned / Non-Atomic Reply**: Creating `/letters/nonexistent/replies/rep-1` or omitting batch `+1` on parent `repliesCount` -> Rejected by `exists(...)` and `getAfter(...)`.
-12. **Unauthorized Unfiltered List / Delete**: Listing `/letters` without `where('status', '==', 'approved')` or calling `deleteDoc` on any letter -> Rejected by `existing().status == 'approved'` and `allow delete: if false`.
+12. **Character View Jump Attack (+500)**: Updating `/character_views/char-1` from 1 to 500 views -> Rejected by `incoming().views == existing().views + 1`.
+

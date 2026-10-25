@@ -140,6 +140,40 @@ function allowReplyCreate(
   );
 }
 
+function isValidCharacterView(data: Record<string, unknown>): boolean {
+  const keys = Object.keys(data);
+  if (keys.length !== 3) return false;
+  if (!['characterId', 'views', 'updatedAt'].every((k) => k in data)) return false;
+  if (typeof data.characterId !== 'string' || !isValidId(data.characterId)) return false;
+  if (typeof data.views !== 'number' || data.views < 1 || data.views > 10000000) return false;
+  if (typeof data.updatedAt !== 'number') return false;
+  return true;
+}
+
+function allowCharacterViewCreate(characterId: string, incoming: Record<string, unknown>): boolean {
+  return (
+    isValidId(characterId) &&
+    isValidCharacterView(incoming) &&
+    incoming.characterId === characterId &&
+    incoming.views === 1 &&
+    incoming.updatedAt === SERVER_TIME
+  );
+}
+
+function allowCharacterViewUpdate(
+  characterId: string,
+  existing: Record<string, unknown>,
+  incoming: Record<string, unknown>
+): boolean {
+  if (!isValidId(characterId) || !isValidCharacterView(incoming)) return false;
+  if (incoming.characterId !== existing.characterId || incoming.characterId !== characterId) return false;
+  if (incoming.updatedAt !== SERVER_TIME) return false;
+  const changedKeys = Object.keys({ ...existing, ...incoming }).filter((k) => incoming[k] !== existing[k]);
+  const onlyViews = changedKeys.length === 2 && changedKeys.includes('views') && changedKeys.includes('updatedAt');
+  return onlyViews && incoming.views === (existing.views as number) + 1;
+}
+
+
 const baseValidLetter: Record<string, unknown> = {
   sender: 'Người Qua Đường Trong Bão Tuyết',
   isAnonymous: true,
@@ -251,6 +285,23 @@ export function runDirtyDozenAudit(): void {
         { ...baseValidLetter, imageUrl: 'javascript:alert(1)' },
         null
       ),
+    },
+    {
+      name: '13. Character View Jump Attack (+500)',
+      allowed: allowCharacterViewUpdate(
+        'char-1',
+        { characterId: 'char-1', views: 1, updatedAt: SERVER_TIME - 1000 },
+        { characterId: 'char-1', views: 501, updatedAt: SERVER_TIME }
+      ),
+    },
+    {
+      name: '14. Character View Shadow Field Injection',
+      allowed: allowCharacterViewCreate('char-1', {
+        characterId: 'char-1',
+        views: 1,
+        updatedAt: SERVER_TIME,
+        ghostField: 'malicious',
+      }),
     },
   ];
 

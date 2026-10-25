@@ -1,5 +1,6 @@
 import { Character, Confession, CreatorProfile, ConfessionReply } from '../types';
 import { INITIAL_CHARACTERS, INITIAL_CONFESSIONS, INITIAL_PROFILE } from '../data/initialData';
+import { recordCharacterViewInFirebase } from './mailboxFirebase';
 
 const CONFESSIONS_KEY = 'thu_gui_mua_tuyet_confessions_v5';
 const CHARACTERS_KEY = 'thu_gui_mua_tuyet_characters_v13';
@@ -221,6 +222,21 @@ export class ApiService {
       }
     } catch (err) {
       console.warn('Network error incrementing view count:', err);
+    }
+
+    try {
+      const fbCount = await recordCharacterViewInFirebase(id);
+      if (typeof fbCount === 'number') {
+        nextCount = Math.max(nextCount, fbCount);
+        localViews[id] = nextCount;
+        try {
+          localStorage.setItem(CHAR_VIEWS_KEY, JSON.stringify(localViews));
+        } catch {
+          // ignored
+        }
+      }
+    } catch (err) {
+      console.warn('Firebase character view increment error:', err);
     }
 
     return nextCount;

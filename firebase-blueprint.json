@@ -162,6 +162,30 @@
         "status",
         "authorUid"
       ]
+    },
+    "CharacterView": {
+      "title": "CharacterView",
+      "description": "Public cumulative view counter for each author character.",
+      "type": "object",
+      "properties": {
+        "characterId": {
+          "type": "string",
+          "description": "ID of the character.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "views": {
+          "type": "integer",
+          "description": "Total cumulative views count."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when view was recorded."
+        }
+      },
+      "required": ["characterId", "views", "updatedAt"]
     }
   },
   "firestore": {
@@ -172,6 +196,10 @@
     "/letters/{letterId}/replies/{replyId}": {
       "schema": "LetterReply",
       "description": "Subcollection of replies associated with a specific mailbox letter."
+    },
+    "/character_views/{characterId}": {
+      "schema": "CharacterView",
+      "description": "Public real-time cumulative view counts for each character."
     }
   }
 }

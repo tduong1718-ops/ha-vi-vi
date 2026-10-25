@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   increment,
   onSnapshot,
   query,
@@ -9,7 +10,7 @@ import {
   updateDoc,
   where,
   writeBatch,
-   Unsubscribe,
+  Unsubscribe,
 } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType } from '../firebase';
 import { Confession, ConfessionCategory, ConfessionReply, StampType } from '../types';
@@ -318,3 +319,70 @@ export async function submitReplyToFirebase(
     handleFirestoreError(error, OperationType.WRITE, `letters/${letterId}/replies/${replyId}`);
   }
 }
+
+/**
+ * Real-time listener for character view counters from Firestore
+ */
+export function subscribeToCharacterViews(
+  onUpdate: (viewsMap: Record<string, number>) => void,
+  onError?: (err: unknown) => void
+): Unsubscribe {
+  const path = 'character_views';
+  return onSnapshot(
+    collection(db, path),
+    (snapshot) => {
+      const map: Record<string, number> = {};
+      snapshot.docs.forEach((docSnap) => {
+        const d = docSnap.data();
+        if (typeof d.views === 'number') {
+          map[docSnap.id] = d.views;
+        }
+      });
+      onUpdate(map);
+    },
+    (error) => {
+      if (onError) onError(error);
+      try {
+        handleFirestoreError(error, OperationType.LIST, path);
+      } catch {
+        // Handled & logged gracefully
+      }
+    }
+  );
+}
+
+/**
+ * Records an incremental view (+1) for a character in Firestore atomically
+ */
+export async function recordCharacterViewInFirebase(characterId: string): Promise<number | null> {
+  if (!characterId) return null;
+  const path = `character_views/${characterId}`;
+  const charDocRef = doc(db, 'character_views', characterId);
+
+  try {
+    const snap = await getDoc(charDocRef);
+    if (!snap.exists()) {
+      await setDoc(charDocRef, {
+        characterId,
+        views: 1,
+        updatedAt: serverTimestamp(),
+      });
+      return 1;
+    } else {
+      const existingViews = Number(snap.data()?.views) || 0;
+      await updateDoc(charDocRef, {
+        views: increment(1),
+        updatedAt: serverTimestamp(),
+      });
+      return existingViews + 1;
+    }
+  } catch (error) {
+    try {
+      handleFirestoreError(error, OperationType.WRITE, path);
+    } catch {
+      // Handled & logged
+    }
+    return null;
+  }
+}
+

@@ -22,6 +22,7 @@ import {
   submitLetterToFirebase,
   submitReplyToFirebase,
   subscribeToLetters,
+  subscribeToCharacterViews,
 } from './services/mailboxFirebase';
 import { INITIAL_PROFILE, INITIAL_CHARACTERS } from './data/initialData';
 
@@ -77,6 +78,25 @@ export default function App() {
       }
     );
     return () => unsub();
+  }, []);
+
+  // Real-time Firebase Firestore subscription for character view counts
+  useEffect(() => {
+    const unsubViews = subscribeToCharacterViews((firestoreViews) => {
+      setCharacters((prev) =>
+        prev.map((c) => {
+          const fbCount = firestoreViews[c.id];
+          if (typeof fbCount === 'number') {
+            return {
+              ...c,
+              views: Math.max(c.views || 0, fbCount),
+            };
+          }
+          return c;
+        })
+      );
+    });
+    return () => unsubViews();
   }, []);
 
   const handleSelectTab = (tab: AppTab) => {

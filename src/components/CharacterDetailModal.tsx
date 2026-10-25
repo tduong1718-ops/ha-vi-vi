@@ -357,7 +357,7 @@ export default function CharacterDetailModal({
               <span className="font-mono tabular-nums font-medium text-[#2A5078]">
                 {(character.views || 0).toLocaleString('vi-VN')}
               </span>
-              <span className="hidden xs:inline sm:inline">lượt xem</span>
+              <span className="text-[11px] sm:text-xs text-[#52779E] inline">lượt xem</span>
             </span>
           </div>
 

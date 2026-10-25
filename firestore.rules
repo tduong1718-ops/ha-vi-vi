@@ -43,6 +43,13 @@ service cloud.firestore {
           && data.imageUrl.size() <= 250000
           && data.imageUrl.matches('^(data:image/[a-zA-Z0-9+\\-]+;base64,[A-Za-z0-9+/=]+|https://[^\\s]+)$')
         );
+    // Validation Blueprint: CharacterView
+    function isValidCharacterView(data) {
+      return data.keys().hasAll(['characterId', 'views', 'updatedAt'])
+        && data.keys().hasOnly(['characterId', 'views', 'updatedAt'])
+        && isValidId(data.characterId)
+        && data.views is int && data.views >= 1 && data.views <= 10000000
+        && data.updatedAt is timestamp;
     }
 
     // Validation Blueprint: Letter
@@ -200,6 +207,27 @@ service cloud.firestore {
         allow update: if false;
         allow delete: if false;
       }
+    }
+
+    match /character_views/{characterId} {
+      allow get: if isValidId(characterId);
+      allow list: if true;
+
+      allow create: if isValidId(characterId)
+        && isValidCharacterView(incoming())
+        && incoming().characterId == characterId
+        && incoming().views == 1
+        && incoming().updatedAt == request.time;
+
+      allow update: if isValidId(characterId)
+        && isValidCharacterView(incoming())
+        && incoming().characterId == existing().characterId
+        && incoming().characterId == characterId
+        && incoming().diff(existing()).affectedKeys().hasOnly(['views', 'updatedAt'])
+        && incoming().views == existing().views + 1
+        && incoming().updatedAt == request.time;
+
+      allow delete: if false;
     }
   }
 }
