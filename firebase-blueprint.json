@@ -105,7 +105,7 @@
           "description": "Parent letter document ID.",
           "minLength": 1,
           "maxLength": 128,
-          "pattern": "^[a-zA-Z0-9_\\-]+$"
+          "pattern": "^[a-zA-Z0-9_-]+$"
         },
         "sender": {
           "type": "string",
@@ -173,7 +173,7 @@
           "description": "ID of the character.",
           "minLength": 1,
           "maxLength": 128,
-          "pattern": "^[a-zA-Z0-9_\\-]+$"
+          "pattern": "^[a-zA-Z0-9_-]+$"
         },
         "views": {
           "type": "integer",

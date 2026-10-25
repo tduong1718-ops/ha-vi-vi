@@ -58,7 +58,15 @@ export default function App() {
           ApiService.getCharacters(),
         ]);
         if (loadedProfile) setProfile(loadedProfile);
-        if (loadedChars && loadedChars.length > 0) setCharacters(loadedChars);
+        if (loadedChars && loadedChars.length > 0) {
+          setCharacters((prev) => {
+            const prevViewsMap = new Map(prev.map((c) => [c.id, c.views || 0]));
+            return loadedChars.map((c) => ({
+              ...c,
+              views: Math.max(c.views || 0, prevViewsMap.get(c.id) || 0),
+            }));
+          });
+        }
       } catch (err) {
         console.error('Error initializing applet state:', err);
       }
@@ -83,6 +91,18 @@ export default function App() {
   // Real-time Firebase Firestore subscription for character view counts
   useEffect(() => {
     const unsubViews = subscribeToCharacterViews((firestoreViews) => {
+      try {
+        const raw = localStorage.getItem('thu_gui_mua_tuyet_char_views_v1');
+        const local = raw ? JSON.parse(raw) : {};
+        const merged: Record<string, number> = { ...local };
+        for (const [k, v] of Object.entries(firestoreViews)) {
+          merged[k] = Math.max(Number(merged[k]) || 0, Number(v) || 0);
+        }
+        localStorage.setItem('thu_gui_mua_tuyet_char_views_v1', JSON.stringify(merged));
+      } catch {
+        // ignored
+      }
+
       setCharacters((prev) =>
         prev.map((c) => {
           const fbCount = firestoreViews[c.id];

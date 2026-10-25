@@ -9,7 +9,7 @@ service cloud.firestore {
 
     // Hardened Global Helpers
     function isValidId(id) {
-      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
     }
 
     function incoming() {
@@ -43,6 +43,8 @@ service cloud.firestore {
           && data.imageUrl.size() <= 250000
           && data.imageUrl.matches('^(data:image/[a-zA-Z0-9+\\-]+;base64,[A-Za-z0-9+/=]+|https://[^\\s]+)$')
         );
+    }
+
     // Validation Blueprint: CharacterView
     function isValidCharacterView(data) {
       return data.keys().hasAll(['characterId', 'views', 'updatedAt'])
