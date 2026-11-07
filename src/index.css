@@ -4,6 +4,7 @@
   --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-script: 'Great Vibes', cursive, 'Brush Script MT', cursive;
   --color-snow: #F9FCFF;
   --color-ice: #DCEEFF;
   --color-frost: #B8D7F3;
@@ -490,6 +491,25 @@ html {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Vinyl record continuous 360-degree rotation */
+@keyframes vinylSlowSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-vinyl-spin {
+  animation: vinylSlowSpin 9s linear infinite;
+  will-change: transform;
+}
+
+.font-script {
+  font-family: var(--font-script), 'Great Vibes', cursive;
 }
 
 

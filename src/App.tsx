@@ -247,6 +247,8 @@ export default function App() {
             onOpenConfessionModal={() => setIsConfessionModalOpen(true)}
             onOpenCharacter={handleOpenCharacter}
             onSelectCharacterTag={handleNavigateToTag}
+            isMusicPlaying={isMusicPlaying}
+            onToggleMusic={handleToggleMusicFromHeader}
           />
         )}
 
