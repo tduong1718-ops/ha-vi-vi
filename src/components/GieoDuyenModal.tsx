@@ -11,7 +11,7 @@ import {
   Snowflake,
 } from 'lucide-react';
 import { Character } from '../types';
-import { FATE_MESSAGES, FateMessage } from '../data/gieoDuyenData';
+import { getFateMessagesForCharacter, FateMessage } from '../data/gieoDuyenData';
 
 interface GieoDuyenModalProps {
   isOpen: boolean;
@@ -56,7 +56,7 @@ export default function GieoDuyenModal({
     }
   }, []);
 
-  // Draw destiny logic with proper timer cleanup
+  // Draw destiny logic with character-specific fate messages
   const handleDrawDestiny = useCallback(() => {
     if (!characters || characters.length === 0) return;
     clearActiveTimers();
@@ -64,9 +64,11 @@ export default function GieoDuyenModal({
     setStage('shuffling');
     setCopied(false);
 
-    // Pick random character and random fate message
+    // Pick random character and character-specific fate message
     const randomChar = characters[Math.floor(Math.random() * characters.length)];
-    const randomFate = FATE_MESSAGES[Math.floor(Math.random() * FATE_MESSAGES.length)];
+    const charFates = getFateMessagesForCharacter(randomChar);
+    const randomFate =
+      charFates[Math.floor(Math.random() * charFates.length)] || charFates[0];
 
     intervalRef.current = setInterval(() => {
       setShuffleTextIdx((prev) => (prev + 1) % shuffleTexts.length);
