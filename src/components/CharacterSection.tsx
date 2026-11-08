@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
 import { Character } from '../types';
 import { CharacterCard } from './CharacterDetailModal';
 
@@ -8,6 +8,7 @@ interface CharacterSectionProps {
   externalSearchQuery?: string;
   onClearExternalSearch?: () => void;
   onOpenCharacter: (character: Character) => void;
+  onOpenGieoDuyenModal?: () => void;
 }
 
 function normalizeVietnamese(str: string): string {
@@ -43,6 +44,7 @@ export default function CharacterSection({
   externalSearchQuery = '',
   onClearExternalSearch,
   onOpenCharacter,
+  onOpenGieoDuyenModal,
 }: CharacterSectionProps) {
   const [searchQuery, setSearchQuery] = useState(externalSearchQuery);
   const [sortBy, setSortBy] = useState<'default' | 'views-desc' | 'name-asc' | 'name-desc'>(
@@ -90,18 +92,31 @@ export default function CharacterSection({
     <section id="characters" className="py-8 sm:py-12 relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="mb-7 sm:mb-8 space-y-1">
-          <div className="flex items-center gap-2 text-xs text-[#7192B6]">
-            <span>❄︎ Thiệp Nhân Vật</span>
-            <span aria-hidden="true">·</span>
-            <span>Những Người Qua Mùa Tuyết</span>
+        <div className="mb-7 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs text-[#7192B6]">
+              <span>❄︎ Thiệp Nhân Vật</span>
+              <span aria-hidden="true">·</span>
+              <span>Những Người Qua Mùa Tuyết</span>
+            </div>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#345880] leading-snug">
+              Thiệp Nhân Vật
+            </h2>
+            <p className="text-xs sm:text-sm text-[#6C8EAF] max-w-xl leading-relaxed">
+              Nơi lưu giữ các Character của Hạ Vi Vi. Nhấn vào từng thiệp để đọc trọn vẹn Backstory, First mess và mở Link GGAI.
+            </p>
           </div>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#345880] leading-snug">
-            Thiệp Nhân Vật
-          </h2>
-          <p className="text-xs sm:text-sm text-[#6C8EAF] max-w-xl leading-relaxed">
-            Nơi lưu giữ các Character của Hạ Vi Vi. Nhấn vào từng thiệp để đọc trọn vẹn Backstory, First mess và mở Link GGAI.
-          </p>
+
+          {onOpenGieoDuyenModal && (
+            <button
+              type="button"
+              onClick={onOpenGieoDuyenModal}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[40px] text-xs sm:text-sm font-semibold text-[#1E456E] bg-gradient-to-r from-[#E3EFFB] to-[#D3E7F8] hover:from-[#D6E6F7] hover:to-[#C7E0F5] border border-[#B1D4F4] rounded-xl transition-all shadow-2xs cursor-pointer whitespace-nowrap shrink-0 hover:scale-102 active:scale-98"
+            >
+              <Sparkles className="w-4 h-4 text-[#3C6898] animate-pulse" />
+              <span>Gieo Quẻ Duyên</span>
+            </button>
+          )}
         </div>
 
         {/* Search (Name & Tag only) & Sort Toolbar */}

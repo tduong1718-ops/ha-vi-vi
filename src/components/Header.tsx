@@ -1,5 +1,5 @@
 import React from 'react';
-import { Music, VolumeX, Snowflake } from 'lucide-react';
+import { Music, VolumeX, Snowflake, Sparkles } from 'lucide-react';
 
 export type AppTab = 'home' | 'characters' | 'confessions';
 
@@ -10,6 +10,7 @@ interface HeaderProps {
   setSnowEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   isMusicPlaying: boolean;
   onToggleMusic: () => void;
+  onOpenGieoDuyenModal?: () => void;
 }
 
 export default function Header({
@@ -19,6 +20,7 @@ export default function Header({
   setSnowEnabled,
   isMusicPlaying,
   onToggleMusic,
+  onOpenGieoDuyenModal,
 }: HeaderProps) {
   const navItems: { id: AppTab; label: string }[] = [
     { id: 'home', label: 'Hiên Nhà Tuyết' },
@@ -29,7 +31,7 @@ export default function Header({
   return (
     <header className="sticky top-0 z-40 frosted-glass border-b border-[#D7E2EE]/80 px-4 sm:px-6 py-2.5 sm:py-3 transition-all">
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3 sm:gap-4">
           {/* Zone 1: Brand wordmark */}
           <div className="flex items-center min-w-0 shrink-0">
             <button
@@ -46,7 +48,7 @@ export default function Header({
           {/* Zone 2: Navigation Links (Desktop & Tablet) */}
           <nav
             aria-label="Điều hướng chính"
-            className="hidden md:flex items-center gap-8 text-sm font-medium text-[#587DA5]"
+            className="hidden md:flex items-center gap-7 text-sm font-medium text-[#587DA5]"
           >
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
@@ -70,8 +72,21 @@ export default function Header({
             })}
           </nav>
 
-          {/* Zone 3: Ambient Toggles (Music Box & Snowfall) */}
+          {/* Zone 3: Ambient Toggles & Gieo Duyên Button */}
           <div className="flex items-center gap-2 shrink-0">
+            {onOpenGieoDuyenModal && (
+              <button
+                type="button"
+                onClick={onOpenGieoDuyenModal}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 h-9 rounded-full bg-gradient-to-r from-[#E2EFFC] to-[#D5E7F9] hover:from-[#D7E9FA] hover:to-[#C8E0F7] text-[#224A75] border border-[#B6D6F5] text-xs font-semibold transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95 whitespace-nowrap"
+                title="Bốc quẻ gieo duyên ngẫu nhiên"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#3D6999] animate-pulse" />
+                <span className="hidden xs:inline">Gieo Duyên</span>
+                <span className="xs:hidden">Gieo Duyên</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={onToggleMusic}
@@ -106,7 +121,7 @@ export default function Header({
           </div>
         </div>
 
-        {/* Mobile Direct Navigation Bar (Always spacious & 1-tap accessible) */}
+        {/* Mobile Direct Navigation Bar */}
         <nav
           aria-label="Điều hướng di động"
           className="md:hidden grid grid-cols-3 gap-1.5 pt-2 mt-2 border-t border-[#DCEAF7]/80"
@@ -133,3 +148,4 @@ export default function Header({
     </header>
   );
 }
+

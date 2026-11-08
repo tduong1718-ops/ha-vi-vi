@@ -8,6 +8,7 @@ import {
   Pause,
   SkipBack,
   SkipForward,
+  Sparkles,
 } from 'lucide-react';
 import { Character, CreatorProfile } from '../types';
 import { CharacterCard } from './CharacterDetailModal';
@@ -21,6 +22,7 @@ interface HomeProfileBannerProps {
   onSelectCharacterTag: (tag: string) => void;
   isMusicPlaying?: boolean;
   onToggleMusic?: () => void;
+  onOpenGieoDuyenModal?: () => void;
 }
 
 /** Monochrome ice-blue Facebook icon */
@@ -122,6 +124,7 @@ export default function HomeProfileBanner({
   onSelectCharacterTag,
   isMusicPlaying = false,
   onToggleMusic,
+  onOpenGieoDuyenModal,
 }: HomeProfileBannerProps) {
   const [coverError, setCoverError] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
@@ -155,27 +158,16 @@ export default function HomeProfileBanner({
     <section id="home" className="pt-2 sm:pt-4 pb-12 sm:pb-16 relative">
       <div className="max-w-5xl mx-auto px-3 sm:px-6 space-y-9 sm:space-y-12">
         {/* ============================================================ */}
-        {/* BANNER GIAO DIỆN CHUẨN THEO ẢNH MẪU (image_99a75591.png):
-            - ĐĨA VINYL XANH DƯƠNG PASTEL NẰM MỘT NỬA TRÊN BANNER, MỘT NỬA BÊN NGOÀI
-            - VIỀN ĐĨA LỘ RA BÊN NGOÀI CÓ ĐỘ DÀY CHUẨN ~40% BÁN KÍNH AVATAR
-            - VIỀN NỬA TRONG BỊ ẢNH BÌA CHE KHUẤT HOÀN TOÀN
-            - HIỆU ỨNG XOAY 360 ĐỘ LIÊN TỤC VỚI VỆT SÁNG PHẢN QUANG RÕ RÀNG
-            - AVATAR HÌNH TRÒN ĐỨNG YÊN VỚI VIỀN TRẮNG SẮC NÉT NẰM ĐÈ LÊN GÓC TRÁI BANNER
-            - TƯƠNG THÍCH MƯỢT MÀ VỚI TẤT CẢ MÀN HÌNH ĐIỆN THOẠI DI ĐỘNG (RESPONSIVE)
-        */}
+        {/* BANNER GIAO DIỆN CHUẨN THEO ẢNH MẪU (image_99a75591.png) */}
         {/* ============================================================ */}
         <div className="relative pt-1 sm:pt-3">
-          {/* Container tạo khoảng đệm lùi sang phải tương thích responsive cho cả mobile & desktop:
-              - Mobile (<640px): pl-[68px] đủ rộng cho đĩa w-[124px] (bán kính 62px) nằm hoàn toàn trong màn hình, không bị che/cắt góc (+6px lề trong container + 12px lề trang = 18px cách mép màn hình điện thoại).
-              - sm/md/lg: Tăng tương xứng đảm bảo viền ngoài của đĩa luôn lộ nửa vòng tròn hoàn mỹ, nửa trong giấu êm ái sau banner.
-          */}
+          {/* Container tạo khoảng đệm lùi sang phải */}
           <div className="relative pl-[68px] sm:pl-[96px] md:pl-[120px] lg:pl-[144px]">
-            {/* 1. VÒNG ĐĨA VINYL (Z-0: Nằm một nửa trên banner, một nửa bên ngoài. Nửa trong bị banner che!) */}
+            {/* 1. VÒNG ĐĨA VINYL */}
             <div
               className="absolute left-[68px] sm:left-[96px] md:left-[120px] lg:left-[144px] top-1/2 -translate-y-1/2 -translate-x-1/2 z-0 pointer-events-none w-[124px] h-[124px] sm:w-[176px] sm:h-[176px] md:w-[220px] md:h-[220px] lg:w-[260px] lg:h-[260px] select-none"
               aria-hidden="true"
             >
-              {/* Vòng đĩa vinyl xoay 360 độ liên tục, vệt sáng phản quang quay tròn rõ nét */}
               <div
                 className="w-full h-full animate-vinyl-spin"
                 style={{ animation: 'vinylSlowSpin 9s linear infinite', willChange: 'transform' }}
@@ -184,7 +176,7 @@ export default function HomeProfileBanner({
               </div>
             </div>
 
-            {/* 2. ẢNH BÌA (COVER CARD: Z-10, HÌNH CHỮ NHẬT NGANG, BO GÓC LỚN, CHE HOÀN TOÀN NỬA TRONG CỦA ĐĨA) */}
+            {/* 2. ẢNH BÌA */}
             <div className="relative z-10 w-full min-h-[176px] sm:min-h-[230px] md:min-h-[270px] lg:min-h-[310px] rounded-[22px] sm:rounded-[32px] md:rounded-[40px] overflow-hidden border-2 border-white/90 ring-1 ring-[#CFE3F6] shadow-[0_20px_50px_-15px_rgba(65,100,140,0.22)] bg-gradient-to-br from-[#EAF4FD] via-[#F3F8FE] to-[#F9FCFF] flex flex-col justify-between">
               {/* Lớp ảnh nền cover */}
               <div className="absolute inset-0 z-0">
@@ -197,12 +189,11 @@ export default function HomeProfileBanner({
                   className="w-full h-full object-cover"
                 />
 
-                {/* Soft gradient glassmorphism overlay for contrast & readability */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-black/10 to-black/35 pointer-events-none" />
                 <div className="absolute inset-0 bg-radial-at-c from-transparent via-transparent to-black/20 pointer-events-none" />
               </div>
 
-              {/* Hàng trên: 3 dấu chấm trang trí góc phải trên cùng */}
+              {/* Hàng trên: 3 dấu chấm trang trí */}
               <div className="relative z-10 pt-3 sm:pt-5 pr-3.5 sm:pr-7 flex items-center justify-end">
                 <div
                   aria-hidden="true"
@@ -214,15 +205,13 @@ export default function HomeProfileBanner({
                 </div>
               </div>
 
-              {/* Hàng giữa & dưới: Tên phong cách thư pháp (Script) + Cụm phát nhạc mini mùa tuyết */}
+              {/* Hàng giữa & dưới */}
               <div className="relative z-10 p-3 sm:p-7 md:p-8 flex flex-col items-end text-right space-y-1.5 sm:space-y-4">
-                {/* Tên Calligraphy Script uốn lượn lãng mạn */}
                 <div className="space-y-0.5 sm:space-y-1">
                   <h1 className="font-script text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-white drop-shadow-[0_4px_16px_rgba(20,40,65,0.6)] leading-tight tracking-normal">
                     {profile.name}
                   </h1>
 
-                  {/* Đường lượn swash tinh tế dưới tên */}
                   <div className="flex items-center justify-end gap-1.5 sm:gap-2 text-white/90" aria-hidden="true">
                     <span className="text-[9px] sm:text-xs">❄︎</span>
                     <span className="h-[1.5px] w-8 sm:w-24 rounded-full bg-gradient-to-l from-white via-white/80 to-transparent" />
@@ -232,9 +221,8 @@ export default function HomeProfileBanner({
                   </div>
                 </div>
 
-                {/* Cụm thanh phát nhạc mini mộng mơ (Aesthetic Player Bar) */}
+                {/* Player Bar */}
                 <div className="pt-0.5 sm:pt-1 flex flex-col items-end gap-1.5 sm:gap-2 w-full max-w-[160px] xs:max-w-[190px] sm:max-w-[260px] md:max-w-[300px]">
-                  {/* Hàng nút điều khiển Playback */}
                   <div className="flex items-center gap-2 sm:gap-3 text-white/90 drop-shadow-md">
                     <button
                       type="button"
@@ -267,7 +255,6 @@ export default function HomeProfileBanner({
                       <SkipForward className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
                     </button>
 
-                    {/* Điểm nhấn hoa tuyết thanh nhã */}
                     <div
                       aria-hidden="true"
                       className="text-white/85 hover:text-white transition-colors ml-0.5 text-xs sm:text-sm select-none"
@@ -276,7 +263,6 @@ export default function HomeProfileBanner({
                     </div>
                   </div>
 
-                  {/* Thanh tiến trình nhạc mỏng với nốt chấm sáng (Scrubber Line) */}
                   <div className="w-full flex items-center gap-1.5 sm:gap-2">
                     <div className="flex-1 h-1 rounded-full bg-white/40 overflow-hidden relative">
                       <div
@@ -297,7 +283,7 @@ export default function HomeProfileBanner({
               </div>
             </div>
 
-            {/* 3. AVATAR (Z-20: HÌNH TRÒN ĐỨNG YÊN HOÀN TOÀN, VIỀN TRẮNG SẮC NÉT NẰM ĐÈ LÊN GÓC TRÁI ẢNH BÌA) */}
+            {/* 3. AVATAR */}
             <div className="absolute left-[68px] sm:left-[96px] md:left-[120px] lg:left-[144px] top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 pointer-events-auto w-[82px] h-[82px] sm:w-[114px] sm:h-[114px] md:w-[144px] md:h-[144px] lg:w-[170px] lg:h-[170px] flex items-center justify-center">
               <div className="w-full h-full rounded-full p-[3px] sm:p-1 bg-white shadow-[0_8px_24px_rgba(20,40,70,0.28)] ring-1 ring-black/5 relative">
                 <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
@@ -320,7 +306,7 @@ export default function HomeProfileBanner({
             </div>
           </div>
 
-          {/* HÀNG NÚT ĐIỀU HƯỚNG NHANH */}
+          {/* HÀNG NÚT ĐIỀU HƯỚNG NHANH & GIEO DUYÊN */}
           <div className="mt-4 sm:mt-6 flex flex-wrap items-center justify-between gap-3 px-1 sm:px-2">
             <div className="flex items-center gap-2 text-xs font-medium text-[#648BAF]">
               <span className="text-[#598CBF]">❄︎</span>
@@ -329,18 +315,31 @@ export default function HomeProfileBanner({
               </span>
             </div>
 
-            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <div className="grid grid-cols-2 sm:flex items-center gap-2.5 w-full sm:w-auto">
+              {onOpenGieoDuyenModal && (
+                <button
+                  type="button"
+                  onClick={onOpenGieoDuyenModal}
+                  className="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 min-h-[40px] text-xs sm:text-sm font-semibold text-[#1F456E] bg-gradient-to-r from-[#E3EFFB] to-[#D3E7F8] hover:from-[#D6E6F7] hover:to-[#C7E0F5] border border-[#B1D4F4] rounded-xl transition-all shadow-2xs cursor-pointer whitespace-nowrap hover:scale-102 active:scale-98"
+                >
+                  <Sparkles className="w-4 h-4 text-[#3C6898] shrink-0 animate-pulse" />
+                  <span>Gieo Duyên Mùa Tuyết</span>
+                </button>
+              )}
+
               <button
+                type="button"
                 onClick={onExploreCharacters}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 min-h-[40px] text-xs sm:text-sm font-semibold text-white bg-[#587DA5] hover:bg-[#476A91] rounded-xl transition-all shadow-2xs cursor-pointer whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 min-h-[40px] text-xs sm:text-sm font-semibold text-white bg-[#587DA5] hover:bg-[#476A91] rounded-xl transition-all shadow-2xs cursor-pointer whitespace-nowrap"
               >
                 <Compass className="w-4 h-4 shrink-0" />
                 <span>Thiệp Nhân Vật</span>
               </button>
 
               <button
+                type="button"
                 onClick={onOpenConfessionModal}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 min-h-[40px] text-xs sm:text-sm font-semibold text-[#345880] bg-white hover:bg-[#F2F7FC] border border-[#CBDCEE] rounded-xl transition-all shadow-2xs cursor-pointer whitespace-nowrap"
+                className="flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 min-h-[40px] text-xs sm:text-sm font-semibold text-[#345880] bg-white hover:bg-[#F2F7FC] border border-[#CBDCEE] rounded-xl transition-all shadow-2xs cursor-pointer whitespace-nowrap"
               >
                 <Feather className="w-4 h-4 text-[#7192B6] shrink-0" />
                 <span>Gửi một bức thư</span>

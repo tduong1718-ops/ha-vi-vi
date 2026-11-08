@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import DreamyBackground from './components/DreamyBackground';
 import SnowLetterIntro from './components/SnowLetterIntro';
 import SendConfessionModal from './components/SendConfessionModal';
+import GieoDuyenModal from './components/GieoDuyenModal';
 import {
   Character,
   Confession,
@@ -48,6 +49,7 @@ export default function App() {
 
   // Modal visibility states
   const [isConfessionModalOpen, setIsConfessionModalOpen] = useState(false);
+  const [isGieoDuyenModalOpen, setIsGieoDuyenModalOpen] = useState(false);
 
   // Load Creator Profile & Characters
   useEffect(() => {
@@ -204,7 +206,8 @@ export default function App() {
   const hasBlockingOverlay =
     showIntro ||
     Boolean(selectedCharacterId) ||
-    isConfessionModalOpen;
+    isConfessionModalOpen ||
+    isGieoDuyenModalOpen;
 
   useEffect(() => {
     if (!hasBlockingOverlay) {
@@ -235,6 +238,7 @@ export default function App() {
         setSnowEnabled={setSnowEnabled}
         isMusicPlaying={isMusicPlaying}
         onToggleMusic={handleToggleMusicFromHeader}
+        onOpenGieoDuyenModal={() => setIsGieoDuyenModalOpen(true)}
       />
 
       {/* Main Content Area: Dedicated View per Tab */}
@@ -249,6 +253,7 @@ export default function App() {
             onSelectCharacterTag={handleNavigateToTag}
             isMusicPlaying={isMusicPlaying}
             onToggleMusic={handleToggleMusicFromHeader}
+            onOpenGieoDuyenModal={() => setIsGieoDuyenModalOpen(true)}
           />
         )}
 
@@ -258,6 +263,7 @@ export default function App() {
             externalSearchQuery={tagSearchQuery}
             onClearExternalSearch={() => setTagSearchQuery('')}
             onOpenCharacter={handleOpenCharacter}
+            onOpenGieoDuyenModal={() => setIsGieoDuyenModalOpen(true)}
           />
         )}
 
@@ -293,6 +299,15 @@ export default function App() {
         onSelectTag={handleNavigateToTag}
       />
 
+      {/* Gieo Duyên Mùa Tuyết Modal */}
+      <GieoDuyenModal
+        isOpen={isGieoDuyenModalOpen}
+        onClose={() => setIsGieoDuyenModalOpen(false)}
+        characters={characters}
+        onOpenCharacter={handleOpenCharacter}
+        onOpenConfessionModal={() => setIsConfessionModalOpen(true)}
+      />
+
       {/* Modals */}
       <SendConfessionModal
         isOpen={isConfessionModalOpen}
@@ -302,3 +317,4 @@ export default function App() {
     </div>
   );
 }
+
