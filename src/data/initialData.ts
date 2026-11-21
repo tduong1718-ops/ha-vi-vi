@@ -11,7 +11,7 @@ Và mình có dùng AI để hỗ trợ viết prompt nhée ạ 🌷🌷
 ݁ ˖Ი𐑼ֶָ֢ 1. Mọi người có thể nhắn tin riêng cho page của Vi Vi, Vi Vi sẽ luôn để ý và phản hồi tin nhắn của mọi người một cách nhanh nhất có thể ✨
 ݁ ˖Ი𐑼ֶָ֢ 2. Mọi người có thể vào sivi discord mà mình gắn link để tìm mình hoặc cần mình hỗ trợ, mình sẽ luôn hỗ trợ mọi người một cách tốt nhất ✨
 Và điều cuối cùng mình muốn cảm ơn tất cả mọi người vì đã cho mình động lực và ủng hộ mình 🌷 User luôn là động lực của mình (｡•̀ᴗ-)✧`,
-  avatarUrl: '/avatar-ha-vi-vi.jpg',
+  avatarUrl: '/assets/aistudio/image_56f93341.png',
   coverUrl: 'https://i.ibb.co/rKBbFTr1/d0dc05e07ab1e7c529dc6a6cfa48355d.gif',
   facebookUrl: 'https://www.facebook.com/profile.php?id=61593839357981#',
   discordUrl: 'https://discord.gg/PQXWDP2GE7',

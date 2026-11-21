@@ -14,6 +14,7 @@ const LEGACY_BIOS = new Set([
 const LEGACY_AVATARS = new Set([
   '/src/assets/images/creator_avatar_vivian_1792465365305.jpg',
   'https://ibb.co/F4BZVNjc',
+  '/avatar-ha-vi-vi.jpg',
 ]);
 const LEGACY_COVERS = new Set([
   '/src/assets/images/winter_hero_landscape_1792465338779.jpg',
